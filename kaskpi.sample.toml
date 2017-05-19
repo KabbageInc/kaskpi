@@ -1,0 +1,14 @@
+[aws]
+region = "us-east-1"
+access_key_id = "xxx" # update with your Access Key ID
+secret_access_key = "xxx" # update with your Secret Access Key
+sns_arn = "arn:aws:sns:us-east-1:xxx:kask-keg-event" # update with your SNS ARN
+heartbeat_interval = "5s"
+
+[arduino]
+serial_port = "/dev/ttys001"
+baud_rate = 115200
+pin_to_tap = { 4 = 1, 5 = 2, 6 = 3, 7 = 4 }
+delay = 300
+threshold = 100
+wiegand_pins = { data0 = 2, data1 = 3 }
