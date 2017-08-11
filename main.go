@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/tarm/goserial"
 	"log"
 	"strconv"
+
+	"github.com/tarm/goserial"
 )
 
 var conf config
@@ -35,5 +36,6 @@ func main() {
 	sendCommand(port, Ft330InitializeCommand{PinCount: len(pins), Pins: pins, Delay: conf.Arduino.Delay, Threshold: conf.Arduino.Threshold})
 	sendCommand(port, WiegandInitalizeCommand{Data0Pin: conf.Arduino.WiegandPins["data0"], Data1Pin: conf.Arduino.WiegandPins["data1"]})
 
-	waitForEvents(port)
+	eventEmitter := getEmitter()
+	waitForEvents(port, eventEmitter)
 }
