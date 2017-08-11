@@ -1,10 +1,19 @@
 package main
 
-import "time"
+import (
+	"encoding/json"
+	"io"
+	"time"
+)
 
 type Message struct {
 	EventType string
 	Timestamp time.Time
+}
+
+func (m Message) Write(w io.Writer) {
+	jsonMessage, _ := json.Marshal(m)
+	w.Write(jsonMessage)
 }
 
 type TapMessage struct {

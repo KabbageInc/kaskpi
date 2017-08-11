@@ -2,16 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/BurntSushi/toml"
 	"log"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/BurntSushi/toml"
 )
 
 type config struct {
 	Aws     awsConfig
 	Arduino arduinoConfig
+	Event   eventConfig
 }
 
 type awsConfig struct {
@@ -29,6 +31,15 @@ type arduinoConfig struct {
 	Delay       int
 	Threshold   int
 	WiegandPins map[string]int `toml:"wiegand_pins"`
+}
+
+type eventConfig struct {
+	EventEmitterName string `toml:"event_emitter_name"`
+	HttpEmitter      httpEmitterConfig
+}
+
+type httpEmitterConfig struct {
+	PostUrl string `toml:"post_url"`
 }
 
 type duration struct {
