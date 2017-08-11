@@ -21,6 +21,11 @@ type TapMessage struct {
 	Tap int
 }
 
+func (m TapMessage) Write(w io.Writer) {
+	jsonMessage, _ := json.Marshal(m)
+	w.Write(jsonMessage)
+}
+
 type HeartbeatMessage struct {
 	Message
 }
@@ -40,13 +45,28 @@ type PourEndMessage struct {
 	RawFt330SensorData
 }
 
+func (m PourEndMessage) Write(w io.Writer) {
+	jsonMessage, _ := json.Marshal(m)
+	w.Write(jsonMessage)
+}
+
 type WiegandStateMessage struct {
 	Message
 	Connected bool
+}
+
+func (m WiegandStateMessage) Write(w io.Writer) {
+	jsonMessage, _ := json.Marshal(m)
+	w.Write(jsonMessage)
 }
 
 type WiegandReceiveMessage struct {
 	Message
 	BitLength int
 	Code      string
+}
+
+func (m WiegandReceiveMessage) Write(w io.Writer) {
+	jsonMessage, _ := json.Marshal(m)
+	w.Write(jsonMessage)
 }
