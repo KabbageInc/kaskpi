@@ -74,7 +74,7 @@ func processFt330PourStart(eventEmitter io.Writer, timestamp uint32, eventPayloa
 				Timestamp: time.Now()},
 			Tap: pinToTap(pin)}}
 
-	msg.Write(eventEmitter)
+	eventEmitter.Write(serializeMessage(msg))
 }
 
 func processFt330PourEnd(eventEmitter io.Writer, timestamp uint32, eventPayload []string) {
@@ -114,7 +114,7 @@ func processFt330PourEnd(eventEmitter io.Writer, timestamp uint32, eventPayload 
 		Duration:           duration,
 		RawFt330SensorData: RawFt330SensorData{Pulses: pulses}}
 
-	msg.Write(eventEmitter)
+	eventEmitter.Write(serializeMessage(msg))
 }
 
 func processWiegandState(eventEmitter io.Writer, timestamp uint32, eventPayload []string) {
@@ -134,7 +134,7 @@ func processWiegandState(eventEmitter io.Writer, timestamp uint32, eventPayload 
 		Connected: connected,
 	}
 
-	msg.Write(eventEmitter)
+	eventEmitter.Write(serializeMessage(msg))
 }
 
 func processWiegandReceive(eventEmitter io.Writer, timestamp uint32, eventPayload []string) {
@@ -158,7 +158,7 @@ func processWiegandReceive(eventEmitter io.Writer, timestamp uint32, eventPayloa
 		Code:      code,
 	}
 
-	msg.Write(eventEmitter)
+	eventEmitter.Write(serializeMessage(msg))
 }
 
 func processHeartbeat(eventEmitter io.Writer, timestamp uint32) {
@@ -166,5 +166,5 @@ func processHeartbeat(eventEmitter io.Writer, timestamp uint32) {
 	fmt.Println()
 
 	//msg := HeartbeatMessage{Message: Message{EventType: "Heartbeat", Timestamp: time.Now()}}
-	//msg.Write(eventEmitter)
+	//eventEmitter.Write(serializeMessage(msg))
 }

@@ -28,8 +28,13 @@ func (w SnsEventEmitter) Write(p []byte) (int, error) {
 	return len(p), sendSnsMessageString(string(p))
 }
 
-func sendSnsMessageStruct(message interface{}) {
+func serializeMessage(message interface{}) []byte {
 	jsonMsg, _ := json.Marshal(message)
+	return jsonMsg
+}
+
+func sendSnsMessageStruct(message interface{}) {
+	jsonMsg := serializeMessage(message)
 	sendSnsMessageString(string(jsonMsg))
 }
 
