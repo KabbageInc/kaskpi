@@ -16,9 +16,9 @@ import (
 
 func getEmitter() io.Writer {
 	if conf.Event.EventEmitterName == "HTTP" {
-		return HttpEventEmitter{}
+		return RetryWrapperEmitter{Writer: HttpEventEmitter{}}
 	}
-	return SnsEventEmitter{}
+	return RetryWrapperEmitter{Writer: SnsEventEmitter{}}
 }
 
 type SnsEventEmitter struct {
@@ -86,4 +86,17 @@ func (w HttpEventEmitter) Write(p []byte) (int, error) {
 	defer response.Body.Close()
 
 	return len(p), nil
+}
+
+type RetryWrapperEmitter struct {
+	Writer io.Writer
+}
+
+func (w RetryWrapperEmitter) Write(p []byte) (int, error) {
+	count, err := w.Writer.Write(p)
+	if err != nil {
+		//write to db for retry
+
+	}
+	return count, err
 }
