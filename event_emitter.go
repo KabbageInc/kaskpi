@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -95,8 +96,18 @@ type RetryWrapperEmitter struct {
 func (w RetryWrapperEmitter) Write(p []byte) (int, error) {
 	count, err := w.Writer.Write(p)
 	if err != nil {
-		//write to db for retry
-
+		go writeToDb(p)
 	}
 	return count, err
+}
+
+var retryInterval = time.Millisecond * 500
+
+func retryLoop() {
+	for {
+		time.Sleep(retryInterval)
+		if hasMessage, value := consumeNext(); hasMessage {
+			getEmitter().Write(value)
+		}
+	}
 }

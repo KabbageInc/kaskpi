@@ -5,12 +5,10 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/boltdb/bolt"
 	"github.com/tarm/goserial"
 )
 
 var conf config
-var eventDb *bolt.DB
 
 const pulsesPerLiterForFt330 int = 2724
 
@@ -19,14 +17,8 @@ func main() {
 	flag.Parse()
 
 	parseConfig(*configFile)
-
-	db, err := bolt.Open("event.db", 0600, nil)
-	if err != nil {
-		//todo set no db mode?
-		log.Fatal(err)
-	}
-	defer db.Close()
-	eventDb = db
+	initDb()
+	go retryLoop()
 
 	// socat -d -d pty,raw,echo=0 stdio
 	c := &serial.Config{Name: conf.Arduino.SerialPort, Baud: conf.Arduino.BaudRate}
@@ -47,4 +39,5 @@ func main() {
 	sendCommand(port, WiegandInitalizeCommand{Data0Pin: conf.Arduino.WiegandPins["data0"], Data1Pin: conf.Arduino.WiegandPins["data1"]})
 
 	waitForEvents(port)
+	closeDb()
 }
