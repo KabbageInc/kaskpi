@@ -17,7 +17,7 @@ func main() {
 	flag.Parse()
 
 	parseConfig(*configFile)
-	initDb()
+	initDb("event.db")
 	go retryLoop()
 
 	// socat -d -d pty,raw,echo=0 stdio

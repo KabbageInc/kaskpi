@@ -12,8 +12,8 @@ import (
 var eventDb *bolt.DB
 var bucket = []byte("eventbucket")
 
-func initDb() {
-	db, err := bolt.Open("event.db", 0600, nil)
+func initDb(path string) {
+	db, err := bolt.Open(path, 0600, nil)
 	if err != nil {
 		//todo set no db mode?
 		log.Fatal(err.Error())
@@ -58,9 +58,19 @@ func consumeNext() (bool, []byte) {
 		b := tx.Bucket(bucket)
 		k, v = b.Cursor().First()
 		if k != nil {
-			b.Delete(k)
+			return b.Delete(k)
 		}
 		return nil
 	})
 	return err == nil && k != nil, v
+}
+
+func getStoredEventCount() (int, error) {
+	var count int
+	err := eventDb.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(bucket)
+		count = b.Stats().KeyN
+		return nil
+	})
+	return count, err
 }
