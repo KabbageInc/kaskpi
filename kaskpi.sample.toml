@@ -12,3 +12,9 @@ pin_to_tap = { 4 = 1, 5 = 2, 6 = 3, 7 = 4 }
 delay = 300
 threshold = 100
 wiegand_pins = { data0 = 2, data1 = 3 }
+
+[event]
+event_emitter_name = "SNS" # current valid values are SNS and HTTP, default is SNS if name is not mapped
+
+[event.httpemitter]
+post_url = "http://partybeerfuntimez.biz/event" # update with your event collection url

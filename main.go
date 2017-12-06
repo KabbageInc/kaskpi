@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"github.com/tarm/goserial"
 	"log"
 	"strconv"
+
+	"github.com/tarm/goserial"
 )
 
 var conf config
@@ -16,6 +17,8 @@ func main() {
 	flag.Parse()
 
 	parseConfig(*configFile)
+	initDb("event.db")
+	go retryLoop()
 
 	// socat -d -d pty,raw,echo=0 stdio
 	c := &serial.Config{Name: conf.Arduino.SerialPort, Baud: conf.Arduino.BaudRate}
@@ -28,7 +31,7 @@ func main() {
 	sendCommand(port, VersionCommand{})
 
 	var pins []int
-	for key, _ := range conf.Arduino.PinToTap {
+	for key := range conf.Arduino.PinToTap {
 		keyAsInt, _ := strconv.Atoi(key)
 		pins = append(pins, keyAsInt)
 	}
@@ -36,4 +39,5 @@ func main() {
 	sendCommand(port, WiegandInitalizeCommand{Data0Pin: conf.Arduino.WiegandPins["data0"], Data1Pin: conf.Arduino.WiegandPins["data1"]})
 
 	waitForEvents(port)
+	closeDb()
 }
