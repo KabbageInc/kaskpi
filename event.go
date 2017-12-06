@@ -11,9 +11,8 @@ import (
 )
 
 type Event struct {
-	Name      string
-	Payload   []string
-	Timestamp uint32
+	Name    string
+	Payload []string
 }
 
 func waitForEvents(port io.ReadWriteCloser) {
@@ -40,13 +39,6 @@ func parseEvent(eventString string) (Event, error) {
 	}
 
 	event.Name = parts[0]
-	var timestampUint64, timestampError = strconv.ParseUint(parts[1], 10, 64)
-
-	if timestampError != nil {
-		return event, errors.New("invalid event timestamp: " + eventString)
-	}
-
-	event.Timestamp = uint32(timestampUint64)
 	event.Payload = parts[2:]
 	return event, nil
 }
@@ -69,7 +61,7 @@ func (event Event) dispatch() {
 }
 
 func (event Event) processFt330PourStart() {
-	fmt.Printf("FT-330 pour start: timestamp=%v, payload=%v", event.Timestamp, strings.Join(event.Payload, ":"))
+	fmt.Printf("FT-330 pour start: timestamp=%v, payload=%v", time.Now().Unix(), strings.Join(event.Payload, ":"))
 	fmt.Println()
 
 	pinRaw := event.Payload[0]
@@ -92,7 +84,7 @@ func (event Event) processFt330PourStart() {
 }
 
 func (event Event) processFt330PourEnd() {
-	fmt.Printf("FT-330 pour end: timestamp=%v, payload=%v\n", event.Timestamp, strings.Join(event.Payload, ":"))
+	fmt.Printf("FT-330 pour end: timestamp=%v, payload=%v\n", time.Now().Unix(), strings.Join(event.Payload, ":"))
 
 	pinRaw := event.Payload[0]
 	pin, err := strconv.Atoi(pinRaw)
@@ -131,7 +123,7 @@ func (event Event) processFt330PourEnd() {
 }
 
 func (event Event) processWiegandState() {
-	fmt.Printf("Wiegand state: timestamp=%v, payload=%v\n", event.Timestamp, strings.Join(event.Payload, ":"))
+	fmt.Printf("Wiegand state: timestamp=%v, payload=%v\n", time.Now().Unix(), strings.Join(event.Payload, ":"))
 
 	connected, err := strconv.ParseBool(event.Payload[0])
 
@@ -150,7 +142,7 @@ func (event Event) processWiegandState() {
 }
 
 func (event Event) processWiegandReceive() {
-	fmt.Printf("Wiegand receive: timestamp=%v, payload=%v\n", event.Timestamp, strings.Join(event.Payload, ":"))
+	fmt.Printf("Wiegand receive: timestamp=%v, payload=%v\n", time.Now().Unix(), strings.Join(event.Payload, ":"))
 
 	bitLengthRaw := event.Payload[0]
 	bitLength, err := strconv.Atoi(bitLengthRaw)
@@ -173,8 +165,8 @@ func (event Event) processWiegandReceive() {
 }
 
 func (event Event) processHeartbeat() {
-	fmt.Printf("heartbeat: timestamp=%v\n", event.Timestamp)
+	fmt.Printf("heartbeat: timestamp=%v\n", time.Now().Unix())
 
-	//msg := HeartbeatMessage{Message: Message{EventType: "Heartbeat", Timestamp: time.Now()}}
-	//eventEmitter.Write(serializeMessage(msg))
+	msg := HeartbeatMessage{Message: Message{EventType: "Heartbeat", Timestamp: time.Now()}}
+	getEmitter().Write(serializeMessage(msg))
 }
