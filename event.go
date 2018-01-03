@@ -30,32 +30,25 @@ func dispatchEvent(event string) {
 	}
 
 	var eventName = parts[0]
-	var timestampUint64, timestampError = strconv.ParseUint(parts[1], 10, 64)
-
-	if timestampError != nil {
-		fmt.Println("invalid event timestamp: " + event)
-		return
-	}
-	var timestamp = uint32(timestampUint64)
 
 	switch eventName {
 	case "heartbeat":
-		processHeartbeat(timestamp)
+		processHeartbeat()
 	case "ft330_start":
-		processFt330PourStart(timestamp, parts[2:])
+		processFt330PourStart(parts[2:])
 	case "ft330_end":
-		processFt330PourEnd(timestamp, parts[2:])
+		processFt330PourEnd(parts[2:])
 	case "wiegand_state":
-		processWiegandState(timestamp, parts[2:])
+		processWiegandState(parts[2:])
 	case "wiegand_receive":
-		processWiegandReceive(timestamp, parts[2:])
+		processWiegandReceive(parts[2:])
 	default:
 		fmt.Println("unknown event: " + event)
 	}
 }
 
-func processFt330PourStart(timestamp uint32, eventPayload []string) {
-	fmt.Printf("FT-330 pour start: timestamp=%v, payload=%v", timestamp, strings.Join(eventPayload, ":"))
+func processFt330PourStart(eventPayload []string) {
+	fmt.Printf("FT-330 pour start: timestamp=%v, payload=%v", time.Now().Unix(), strings.Join(eventPayload, ":"))
 	fmt.Println()
 
 	pinRaw := eventPayload[0]
@@ -77,8 +70,8 @@ func processFt330PourStart(timestamp uint32, eventPayload []string) {
 
 }
 
-func processFt330PourEnd(timestamp uint32, eventPayload []string) {
-	fmt.Printf("FT-330 pour end: timestamp=%v, payload=%v", timestamp, strings.Join(eventPayload, ":"))
+func processFt330PourEnd(eventPayload []string) {
+	fmt.Printf("FT-330 pour end: timestamp=%v, payload=%v", time.Now().Unix(), strings.Join(eventPayload, ":"))
 	fmt.Println()
 
 	pinRaw := eventPayload[0]
@@ -118,8 +111,8 @@ func processFt330PourEnd(timestamp uint32, eventPayload []string) {
 
 }
 
-func processWiegandState(timestamp uint32, eventPayload []string) {
-	fmt.Printf("Wiegand state: timestamp=%v, payload=%v", timestamp, strings.Join(eventPayload, ":"))
+func processWiegandState(eventPayload []string) {
+	fmt.Printf("Wiegand state: timestamp=%v, payload=%v", time.Now().Unix(), strings.Join(eventPayload, ":"))
 	fmt.Println()
 
 	connected, err := strconv.ParseBool(eventPayload[0])
@@ -138,8 +131,8 @@ func processWiegandState(timestamp uint32, eventPayload []string) {
 	sendSnsMessageStruct(msg)
 }
 
-func processWiegandReceive(timestamp uint32, eventPayload []string) {
-	fmt.Printf("Wiegand receive: timestamp=%v, payload=%v", timestamp, strings.Join(eventPayload, ":"))
+func processWiegandReceive(eventPayload []string) {
+	fmt.Printf("Wiegand receive: timestamp=%v, payload=%v", time.Now().Unix(), strings.Join(eventPayload, ":"))
 	fmt.Println()
 
 	bitLengthRaw := eventPayload[0]
@@ -162,10 +155,10 @@ func processWiegandReceive(timestamp uint32, eventPayload []string) {
 	sendSnsMessageStruct(msg)
 }
 
-func processHeartbeat(timestamp uint32) {
-	fmt.Printf("heartbeat: timestamp=%v", timestamp)
+func processHeartbeat() {
+	fmt.Printf("heartbeat: timestamp=%v", time.Now().Unix())
 	fmt.Println()
 
-	//msg := HeartbeatMessage{Message: Message{EventType: "Heartbeat", Timestamp: time.Now()}}
-	//sendSnsMessageStruct(msg)
+	msg := HeartbeatMessage{Message: Message{EventType: "Heartbeat", Timestamp: time.Now()}}
+	sendSnsMessageStruct(msg)
 }
